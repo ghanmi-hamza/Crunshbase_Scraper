@@ -21,4 +21,8 @@ class MongoDb:
         collection1 = self.database[collection]
         collection1.insert_one(data)
         return()
+    def show_data(self, collection):
+        collection1 = self.database[collection]
+        data = collection1.find_one()
+        return(data)
 
