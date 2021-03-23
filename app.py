@@ -21,14 +21,20 @@ def index():
     m=MongoDb(database_name)
     
     for startup in startup_list: 
-        status = "running"
         if m.verify(startup):
-            startup_data = m.show_data(startup)
-            status = "succeeded"
-            print(startup+' : '+status) 
+            #startup_data = m.show_data(startup)
+            if m.verify_status(startup, status='succeeded') :
+                pass
+            elif m.verify_status(startup, status='failed') :
+                startup_list_1.append(startup)
+                m.update_status(startup, {'status' : 'running'})
+                
            
         else:
+            m.insert_data(startup, {'status' : 'running'})
             startup_list_1.append(startup)
+
+
 
     MAX_THREADS = 5
     if len(startup_list_1) >= 5:
@@ -52,68 +58,30 @@ def index():
             thread_4.join()
             thread_5.join()
 
-            if thread_1.status == 'succeeded':
-                m.insert_data(collection = startup_list_1[i], data = thread_1.data)
-            if thread_2.status == 'succeeded':
-                m.insert_data(collection = startup_list_1[i+1], data = thread_2.data)
-            if thread_3.status == 'succeeded':
-                m.insert_data(collection = startup_list_1[i+2], data = thread_3.data)
-            if thread_4.status == 'succeeded':
-                m.insert_data(collection = startup_list_1[i+3], data = thread_4.data)
-            if thread_5.status == 'succeeded':
-                m.insert_data(collection = startup_list_1[i+4], data = thread_5.data)
+            
+            m.replace_data(collection = startup_list_1[i], data = thread_1.data)
+            
+            m.replace_data(collection = startup_list_1[i+1], data = thread_2.data)
+            
+            m.replace_data(collection = startup_list_1[i+2], data = thread_3.data)
+            
+            m.replace_data(collection = startup_list_1[i+3], data = thread_4.data)
+            
+            m.replace_data(collection = startup_list_1[i+4], data = thread_5.data)
             
         if len(startup_list_1) - (len(startup_list_1)//MAX_THREADS)*MAX_THREADS > 0 :
             for startup in startup_list_1[(len(startup_list_1)//MAX_THREADS)*MAX_THREADS:]:
                 p=Profile(startup)
                 p.run()
-                if p.status == 'succeeded':
-                    m.insert_data(collection = startup, data = p.data)
+
+                m.replace_data(collection = startup, data = p.data)
     else:
         for startup in startup_list_1:
+         #   list_thread.append(Profile(startup))
             p=Profile(startup)
             p.run()
-            if p.status == 'succeeded':
-                m.insert_data(collection = startup, data = p.data)
-
-    """
-    while VERIFICATION:
-        if i + MAX_THREADS <= len(startup_list_1): 
-            for startup in startup_list_1[i:i+MAX_THREADS]:
-                try :
-                    print(startup+' : '+status) 
-                    thread_startup = Profile(startup)   
-                    thread_startup.start() 
-                    #thread_startup.join()
-                    #dic['thread'+str(startup)] =  
-                    #thred_startup.join()    
-                    #thread_+str(startup).start()                       
-                    #p=Profile(startup)
-                    #startup_data=p.scraping()
-                    '''m.insert_data(collection = startup, data = startup_data)
-                    status = "succeeded"
-                    print(startup+' : '+status)'''
-                except:
-                    thread_startup.close_browser()
-                    #p.close_browser()
-        else :
-            VERIFICATION = False
-            for startup in startup_list_1[i:i+MAX_THREADS]:
-                try :
-                    print(startup+' : '+status) 
-                    thread_startup = Profile(startup)   
-                    thread_startup.start() 
-                    #dic['thread'+str(startup)] =  
-                    #thred_startup.join()    
-                    #thread_+str(startup).start()                       
-                    #p=Profile(startup)
-                    #startup_data=p.scraping()
-                    '''m.insert_data(collection = startup, data = startup_data)
-                    status = "succeeded"
-                    print(startup+' : '+status)'''
-                except:
-                    thread_startup.close_browser()
-                    #p.close_browser()"""
+            
+            m.replace_data(collection = startup, data = p.data)
 
     return(render_template('view1.html'))
     

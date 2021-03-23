@@ -130,11 +130,13 @@ class Profile(Thread):
             self.data.update(self.news())
             self.data.update(self.people())
             self.data.update(self.financial())
+            self.data.update({"status":self.status})
             self.close_browser()
             print(self.name+' : '+self.status)
         except:
             self.close_browser()
             self.status = 'failed'
+            self.data = {"status":self.status}
             print(self.name+' : '+self.status)
         return(self.data,self.status)
     def close_browser(self):
