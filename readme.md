@@ -14,7 +14,6 @@ This project requires Webdriver to run. So Please make sure that Firefox is inst
 ### Command Line : 
 
 ```
-$ cd Crawler
 $ python app.py
 ```
 
