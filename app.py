@@ -77,7 +77,6 @@ def index():
                 m.replace_data(collection = startup, data = p.data)
     else:
         for startup in startup_list_1:
-         #   list_thread.append(Profile(startup))
             p=Profile(startup)
             p.run()
             
